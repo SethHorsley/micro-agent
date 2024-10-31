@@ -27,7 +27,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.state {
 			case stateSelectLargeProvider:
 				m.config.LargeProvider.Provider = m.getSelectedProvider()
-				m.choices = m.providers[m.getSelectedProvider()]
+				m.textInput.Reset()
+				m.state = stateEnterLargeProviderKey
+
+			case stateEnterLargeProviderKey:
+				providerKey := m.getSelectedProvider()
+				m.config.Providers[providerKey] = config.Provider{APIKey: m.textInput.Value()}
+				m.choices = m.providers[providerKey]
 				m.cursor = 0
 				m.state = stateSelectLargeModel
 
@@ -39,21 +45,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			case stateSelectSmallProvider:
 				m.config.SmallProvider.Provider = m.getSelectedProvider()
-				m.choices = m.providers[m.getSelectedProvider()]
+				// If using same provider as large, skip key entry
+				if m.config.SmallProvider.Provider == m.config.LargeProvider.Provider {
+					m.choices = m.providers[m.getSelectedProvider()]
+					m.cursor = 0
+					m.state = stateSelectSmallModel
+				} else {
+					m.textInput.Reset()
+					m.state = stateEnterSmallProviderKey
+				}
+
+			case stateEnterSmallProviderKey:
+				providerKey := m.getSelectedProvider()
+				m.config.Providers[providerKey] = config.Provider{APIKey: m.textInput.Value()}
+				m.choices = m.providers[providerKey]
 				m.cursor = 0
 				m.state = stateSelectSmallModel
 
 			case stateSelectSmallModel:
 				m.config.SmallProvider.Model = m.choices[m.cursor]
-				m.state = stateEnterOpenAIKey
-
-			case stateEnterOpenAIKey:
-				m.config.Providers["open_ai"] = config.Provider{APIKey: m.textInput.Value()}
-				m.textInput.Reset()
-				m.state = stateEnterAnthropicKey
-
-			case stateEnterAnthropicKey:
-				m.config.Providers["anthropic"] = config.Provider{APIKey: m.textInput.Value()}
 				if err := config.Save(m.config); err != nil {
 					m.err = err
 					return m, tea.Quit

@@ -11,20 +11,22 @@ func (m Model) View() string {
 	case stateSelectLargeProvider:
 		return m.renderChoices("Select your large language model provider:")
 
+	case stateEnterLargeProviderKey:
+		return fmt.Sprintf("Enter your %s API Key:\n\n%s",
+			m.config.LargeProvider.Provider, m.textInput.View())
+
 	case stateSelectLargeModel:
 		return m.renderChoices("Select the model for your large provider:")
 
 	case stateSelectSmallProvider:
 		return m.renderChoices("Select your small language model provider:")
 
+	case stateEnterSmallProviderKey:
+		return fmt.Sprintf("Enter your %s API Key:\n\n%s",
+			m.config.SmallProvider.Provider, m.textInput.View())
+
 	case stateSelectSmallModel:
 		return m.renderChoices("Select the model for your small provider:")
-
-	case stateEnterOpenAIKey:
-		return "Enter your OpenAI API Key:\n\n" + m.textInput.View()
-
-	case stateEnterAnthropicKey:
-		return "Enter your Anthropic API Key:\n\n" + m.textInput.View()
 
 	case stateDone:
 		return "Configuration saved successfully!\n"

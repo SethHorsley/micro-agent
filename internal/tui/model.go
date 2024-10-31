@@ -12,11 +12,11 @@ type setupState int
 
 const (
 	stateSelectLargeProvider setupState = iota
+	stateEnterLargeProviderKey
 	stateSelectLargeModel
 	stateSelectSmallProvider
+	stateEnterSmallProviderKey // Only used if different from large provider
 	stateSelectSmallModel
-	stateEnterOpenAIKey
-	stateEnterAnthropicKey
 	stateDone
 )
 
